@@ -3,7 +3,7 @@
 Plugin Name: EuroFIFA - Online League
 Plugin URI: http://eurofifa.com/
 Description: This plugin allows you to create and manage online tournaments on your EuroFIFA wordpress driven website. For more information on the development please visit http://eurofifa.com/online website. 
-Version: 0.3
+Version: 0.3.0.3
 Author: MagoR
 */
 
@@ -637,6 +637,7 @@ class EuroFIFALeagueLoader {
      * @return bool on error
      * 
      * @note show form to create new league from backend
+     * @note upon save loads manage league view
      * 
      * @todo spearate $_POST handler
      * @todo dynamic form elements
@@ -646,7 +647,6 @@ class EuroFIFALeagueLoader {
      * 
     */
     function load_create_league(){ 
-        //save if we have posted something
         if($_POST){ 
             $this->save_league($_POST);
             $this->load_leagues();
