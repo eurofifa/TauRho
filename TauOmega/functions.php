@@ -1,5 +1,0 @@
-<?php
-  /**
-   * Helpers
-   * @todo construct
-   */
