@@ -220,8 +220,9 @@ class EuroFIFALeagueLoader {
      * @note expects raw query results and number of columns to show
      * @note then generates table.body for HTML output
      * @note $link parameter accepts base URLs for edit link generation
+     * @note place result between <table> tags!
      *
-     * @todo custom table.header generation
+     * @done custom table.header generation
      * @todo full table generation
      * 
     */
@@ -230,6 +231,13 @@ class EuroFIFALeagueLoader {
         $cols = $setup[0];
         $heads = $setup[1];
         
+        if($heads){
+            $result .= '<thead><tr>';
+            foreach ($heads as $value){ $result .= '<td>' . $value . '</td>'; }
+            $result .= '</tr></thead>';
+        }
+        
+        $result .= '<tbody>';
         
         foreach ($arg as $key => $value){ 
             $count = 0;
@@ -254,6 +262,9 @@ class EuroFIFALeagueLoader {
             } 
             $result .= '</tr>';
         }
+        
+        $result .= '</tbody>';
+        
         return $result;
     }
 
@@ -611,7 +622,7 @@ class EuroFIFALeagueLoader {
         if($_POST){ 
             $this->update_league($_POST);
         }
-        $this->view = $this->_tableIzer($this->get_league(),array(array(1,3,4,5,6,7,8,9)),'admin.php?page=manage-league&m=load_edit_league&v=');
+        $this->view = $this->_tableIzer($this->get_league(),array(array(1,3,4,5,6,7,8,9),array('Name', 'Type', 'Platform', 'Game', 'Start', 'End', 'Players', 'Status')),'admin.php?page=manage-league&m=load_edit_league&v=');
         $this->_loadTemplate('leagues', true);
         
     }
