@@ -1,0 +1,16 @@
+/* 
+    Created on : Dec 18, 2013, 10:07:39 PM
+    Author     : Magor
+*/
+
+table.dataTable tr.odd td.sorting_1, table.dataTable tr.odd { 
+    
+    background-color: #def1ff;
+
+}
+ 
+table.dataTable tr.even td.sorting_1, table.dataTable tr.even { 
+
+    background-color: white;
+    
+}
