@@ -137,6 +137,7 @@ class EuroFIFALeagueLoader {
 	$wpdb->ef_matches = $wpdb->prefix . 'ef_matches';
 	$wpdb->ef_objections = $wpdb->prefix . 'ef_objections';
         $wpdb->ef_metas = $wpdb->prefix . 'usermeta';
+        $wpdb->ef_users = $wpdb->prefix . 'users';
     }
     
    /**
@@ -176,6 +177,8 @@ class EuroFIFALeagueLoader {
      * 
      * @done dynamic request determination (admin/frontend)
      * 
+     * @state COMPLETE/CLOSED
+     * 
     */
     private function _loadTemplate($arg,$admin = false){ 
         $result = $this->view;
@@ -183,7 +186,7 @@ class EuroFIFALeagueLoader {
         if(is_admin() || $admin){
             require_once (dirname (__FILE__) . '/admin/'.$arg.'.php'); 
         }else{ 
-            require_once (dirname (__FILE__) . '/view/'.$arg.'.php');
+            require_once (dirname (__FILE__) . '/frontend/'.$arg.'.php');
         }
     }
 
@@ -348,38 +351,22 @@ class EuroFIFALeagueLoader {
       * @param $arg int
       * @return array assoc
       * 
-      * @note returns all information of any requested or all players
+      * @note returns basic information of any requested or all players
       * 
       * @todo finalization and further enhancement
-      * @state INCOMPLETE/INOP
+      * @state COMPLETE/TEST FAILED
       * 
     */
     function get_player($arg = false){ 
         global $wpdb;
-      
-        if(!$arg){
-            $result = get_users(array(
-                'orderby' => 'login',
-                'fields' => 'all'
-            ));   
-            
-            $res = (array) $result;
-            
-            foreach ($res as $key => $value){ 
-                foreach ($value as $x => $y){ 
-                    if($x == 'ID'){ 
-                        $user = $this->get_ef_meta();
-                        
-                        
-                    }
-                }
-            }
-            
-            exit;
-            
+
+        if($arg){ 
+            $result = $wpdb->get_results("SELECT ID, usernicename, display_name FROM {$wpdb->ef_users} WHERE ID = $arg",ARRAY_A); 
+            return $result[0];
         }else{ 
-            
+           return $wpdb->get_results("SELECT ID, usernicename, display_name FROM {$wpdb->ef_users}");
         }
+   
     }
  
      /**
@@ -704,7 +691,7 @@ class EuroFIFALeagueLoader {
      * 
     */
     function load_manage_league_progress($arg = false){ 
-        $this->data['users'] = $this->get_ef_meta();
+        $this->data['users'] = $this->get_player();
         $this->view = $this->get_league($arg);
         $this->_loadTemplate('manage_league_progress', true); 
     }
