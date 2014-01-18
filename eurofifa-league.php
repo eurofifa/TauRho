@@ -206,14 +206,16 @@ class EuroFIFALeagueLoader {
     }
     
     /**
-     * TableIzer v1.1 
+     * TableIzer v1.2 
      * 
      * @author: MagoR
      * 
      * @param $arg array associative
-     * @param $cols array numeric 
+     * @param $setup array numeric | string 
      * @param $link bool
      * @return string table body
+     * 
+     * @example $this->_tableIzer($data,array(array(1,3,4,5),array('Name', 'Stuff 1', 'Stuff 2')),false);
      * 
      * @note expects raw query results and number of columns to show
      * @note then generates table.body for HTML output
@@ -223,7 +225,12 @@ class EuroFIFALeagueLoader {
      * @todo full table generation
      * 
     */
-    private function _tableIzer($arg,$cols,$link = false){     
+    private function _tableIzer($arg,$setup,$link = false){     
+        
+        $cols = $setup[0];
+        $heads = $setup[1];
+        
+        
         foreach ($arg as $key => $value){ 
             $count = 0;
             $leap = 0;
@@ -604,7 +611,7 @@ class EuroFIFALeagueLoader {
         if($_POST){ 
             $this->update_league($_POST);
         }
-        $this->view = $this->_tableIzer($this->get_league(),array(1,3,4,5,6,7,8,9),'admin.php?page=manage-league&m=load_edit_league&v=');
+        $this->view = $this->_tableIzer($this->get_league(),array(array(1,3,4,5,6,7,8,9)),'admin.php?page=manage-league&m=load_edit_league&v=');
         $this->_loadTemplate('leagues', true);
         
     }
