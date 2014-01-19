@@ -208,7 +208,12 @@ class EuroFIFALeagueLoader {
         $result = $this->view;
         $data = $this->data;
         $modules = $this->modules;
-        if($module){ return file_get_contents(dirname (__FILE__) . '/admin/'.$arg.'.php'); }
+        if($module){ 
+            ob_start();
+            include dirname (__FILE__) . '/admin/'.$arg.'.php';
+            $result = ob_get_clean();
+            return $result;
+        }
         if(is_admin() || $admin){
             require_once (dirname (__FILE__) . '/admin/'.$arg.'.php'); 
         }else{ 
