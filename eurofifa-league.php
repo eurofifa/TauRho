@@ -294,7 +294,7 @@ class EuroFIFALeagueLoader {
     }
     
     /**
-     * Array Izer v0.5
+     * Array Izer v1.0
      * @author MagoR
      * 
      * @param $arg array
@@ -304,24 +304,22 @@ class EuroFIFALeagueLoader {
      * 
      * @note shows editable array
      * 
-     * @todo more intelligent replacement
+     * @todo optional comparism with another array
+     * 
+     * @state COMPLETE/OPEN
      * 
     */
     private function _arrayIzer($arg, $link = false, $button = false){ 
         
         if(!$button){ $button = 'Save'; }
         
-        $result .= '<table width="200">';
+        $result .= '<table width="200"><tbody>';
         
-        foreach ($arg as $key => $value){ 
-            foreach($value as $x => $y){
-                if($x == 'user_nicename'){
-                    $result .= '<tr><td><form action="" method="post">'.$y.'</td><td><input type="submit" name="submit" class="button button-primary" value="'.$button.'"></form></td></tr>';
-                }
-            }
+        foreach ($arg as $key => $value){          
+                    $result .= '<tr><td><form action="" method="post"><input type="hidden" name="ID" value="'.$value['ID'].'"/>'.$value['user_nicename'].'</td><td><input type="submit" name="submit" class="button button-primary" value="'.$button.'"></form></td></tr>';
         }
         
-        $result .= '</table>';
+        $result .= '</tbody></table>';
         
         return $result;
     }
