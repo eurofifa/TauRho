@@ -31,13 +31,7 @@
     </table> 
 </form>
 <div class="meta-box-sortables ui-sortable">
-        <div id="linksubmitdiv" class="postbox closed" style="margin:10px 0;">
-            <div class="handlediv" title="Click to toggle"><br></div>
-            <h3 class="hndle" style="padding: 5px;"><span>Add Players</span></h3>
-            <div class="inside">
-                <p><?php echo $data['users']; ?></p>
-            </div>
-        </div>
+        <?php echo $modules; ?>
         <div id="linksubmitdiv" class="postbox " style="margin:10px 0;">
             <div class="handlediv" title="Click to toggle"><br></div>
             <h3 class="hndle" style="padding: 5px;"><span>Kick Players</span></h3>

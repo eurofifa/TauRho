@@ -26,6 +26,7 @@ class EuroFIFALeagueLoader {
      * @var $remark bool general switch for true or false clauses currently used by _arrayInput
      * @var $view array|string general conduit to the HTML output usually for strings or associative arrays
      * @var $data array|string secondary conduit to any HTML output usually for strings or associative arrays
+     * @var $modules content for conditional or unconditional module include
      * @protected $wpdb callable global variable $wpdb through protected var (eg. $this->wpdb)
      * 
      * @note variables like $view and $data shall be called as $result and $data at the template
@@ -34,6 +35,7 @@ class EuroFIFALeagueLoader {
     var $remark = false;
     var $view = false;
     var $data = false;
+    var $modules = false;
     protected $wpdb = false;
 
 
@@ -195,15 +197,18 @@ class EuroFIFALeagueLoader {
      * 
      * @note creates requested HTML output using the appropriate template
      * @note and forwards $view and $data class variables for outputting
+     * @note capable to return module content
      * 
      * @done dynamic request determination (admin/frontend)
      * 
      * @state COMPLETE/CLOSED
      * 
     */
-    private function _loadTemplate($arg,$admin = false){ 
+    private function _loadTemplate($arg,$admin = false,$module = false){ 
         $result = $this->view;
         $data = $this->data;
+        $modules = $this->modules;
+        if($module){ return file_get_contents(dirname (__FILE__) . '/admin/'.$arg.'.php'); }
         if(is_admin() || $admin){
             require_once (dirname (__FILE__) . '/admin/'.$arg.'.php'); 
         }else{ 
@@ -344,8 +349,38 @@ class EuroFIFALeagueLoader {
         
         return $result;
     }
-        
     
+    /**
+     * Check State
+     * 
+     * @author MagoR
+     * 
+     * @param $arg array
+     * @return bool
+     * 
+     * @note returns true if requested status found
+     * @note by default checks requested state in among the leagues
+     * @note if no search parameter provided or no item ID assigned returns FALSE
+     * @note fully customizable state check  
+     * 
+     * @state COMPLETE/CLOSED
+     * 
+    */
+    private function _check_state($arg = array('return' => 'status','table' => false,'column' => 'status','search' => false, 'C_ID' => 'ID', 'ID' => false)){ 
+        global $wpdb;
+        //$arg['table'] = (isset($arg['table'])) ? $arg['table'] : $wpdb->ef_leagues;
+        if(!$arg['table']){ $arg['table'] = $wpdb->ef_leagues; }
+        if(!$arg['search'] || !$arg['ID']){ return false; }
+        
+        $result = $this->wpdb->get_results("SELECT {$arg['return']} FROM {$arg['table']} WHERE {$arg['column']} = {$arg['search']} AND {$arg['C_ID']} = {$arg['ID']}", ARRAY_A);
+        
+        if($result[$arg['return']]){ 
+            return true;
+        }else{ 
+            return false;
+        } 
+    }
+        
     /**
      * Query User Meta Data
      * 
@@ -370,6 +405,32 @@ class EuroFIFALeagueLoader {
             return $result[0];
         }
         
+    }
+    
+    /**
+     * Show Module
+     * 
+     * @author MagoR
+     * 
+     * @param $arg array for _check_state method
+     * @param $module string requested module
+     * @return bool
+     * 
+     * @note for more options check out _check_state method documentation
+     * @note to unconditionally include a module just omit providing $arg parameter
+     * 
+     * @state COMPLETE/CLOSED
+     * 
+    */
+    function show_module($module, $arg = false){ 
+        if($arg){
+            $check = $this->_check_state($arg);
+        }else{ 
+            $check = true;
+        }
+        if($check){
+          return $this->_loadTemplate('modules/'.$module,true,true);
+        }
     }
 
     /**
@@ -746,6 +807,7 @@ class EuroFIFALeagueLoader {
     function load_manage_league_progress($arg = false){ 
         $this->data['users'] = $this->_arrayIzer($this->get_player(),false,'Add');
         $this->view = $this->get_league($arg);
+        $this->modules = $this->show_module('add_players');
         $this->_loadTemplate('manage_league_progress', true); 
     }
     
