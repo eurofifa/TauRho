@@ -3,7 +3,6 @@
 <p>
     This screen allows you to manage the progress of your league. You might add or kick players to the league.
 </p>
-<?php var_dump($data); ?>
 <form action="" method="post" class="stuffbox" style="padding: 25px">
     <table class="form-table">    
         <tr valign="top">
@@ -36,7 +35,7 @@
             <div class="handlediv" title="Click to toggle"><br></div>
             <h3 class="hndle" style="padding: 5px;"><span>Add Players</span></h3>
             <div class="inside">
-                <p>This is just sample text.</p>
+                <p><?php echo $data['users']; ?></p>
             </div>
         </div>
         <div id="linksubmitdiv" class="postbox " style="margin:10px 0;">

@@ -294,6 +294,40 @@ class EuroFIFALeagueLoader {
     }
     
     /**
+     * Array Izer v0.5
+     * @author MagoR
+     * 
+     * @param $arg array
+     * @param $link string action URL
+     * @param $button string custom button label
+     * @return string for output
+     * 
+     * @note shows editable array
+     * 
+     * @todo more intelligent replacement
+     * 
+    */
+    private function _arrayIzer($arg, $link = false, $button = false){ 
+        
+        if(!$button){ $button = 'Save'; }
+        
+        $result .= '<table width="200">';
+        
+        foreach ($arg as $key => $value){ 
+            foreach($value as $x => $y){
+                if($x == 'user_nicename'){
+                    $result .= '<tr><td><form action="" method="post">'.$y.'</td><td><input type="submit" name="submit" class="button button-primary" value="'.$button.'"></form></td></tr>';
+                }
+            }
+        }
+        
+        $result .= '</table>';
+        
+        return $result;
+    }
+        
+    
+    /**
      * Query User Meta Data
      * 
      * @author MagoR
@@ -364,7 +398,7 @@ class EuroFIFALeagueLoader {
             $result = $wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$wpdb->ef_users} WHERE ID = $arg",ARRAY_A); 
             return $result[0];
         }else{ 
-           return $wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$wpdb->ef_users}");
+           return $wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$wpdb->ef_users}", ARRAY_A);
         }
    
     }
@@ -691,7 +725,7 @@ class EuroFIFALeagueLoader {
      * 
     */
     function load_manage_league_progress($arg = false){ 
-        $this->data['users'] = $this->get_player();
+        $this->data['users'] = $this->_arrayIzer($this->get_player(),false,'Add');
         $this->view = $this->get_league($arg);
         $this->_loadTemplate('manage_league_progress', true); 
     }
