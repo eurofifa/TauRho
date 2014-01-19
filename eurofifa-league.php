@@ -26,6 +26,7 @@ class EuroFIFALeagueLoader {
      * @var $remark bool general switch for true or false clauses currently used by _arrayInput
      * @var $view array|string general conduit to the HTML output usually for strings or associative arrays
      * @var $data array|string secondary conduit to any HTML output usually for strings or associative arrays
+     * @protected $wpdb callable global variable $wpdb through protected var (eg. $this->wpdb)
      * 
      * @note variables like $view and $data shall be called as $result and $data at the template
      *   
@@ -33,7 +34,9 @@ class EuroFIFALeagueLoader {
     var $remark = false;
     var $view = false;
     var $data = false;
-    
+    protected $wpdb = false;
+
+
     /**
      * Constructor
      * 
@@ -43,6 +46,7 @@ class EuroFIFALeagueLoader {
      * @note default constructor initializes the EuroFIFA League Engine
      * @note defines client and host path as constants (e.g. EF_URL, EF_PATH)
      * @note declares database tables via _defineTables() and determines location with _loadLocation()
+     * @note registers WPDB to class variable (protected) $this->wpdb
      * 
     */
     function __construct() {
@@ -53,6 +57,7 @@ class EuroFIFALeagueLoader {
         define( 'EF_PATH', WP_PLUGIN_DIR.'/eurofifa-league' );
 
         $this->_defineTables();
+        $this->_registerWPDB();
         $this->_loadLocation();
     }
     
@@ -138,6 +143,22 @@ class EuroFIFALeagueLoader {
 	$wpdb->ef_objections = $wpdb->prefix . 'ef_objections';
         $wpdb->ef_metas = $wpdb->prefix . 'usermeta';
         $wpdb->ef_users = $wpdb->prefix . 'users';
+    }
+    
+    
+    /**
+     * Introduce WPDB to class variable
+     * 
+     * @author MagoR
+     * 
+     * @param none none
+     * @return bool on error
+     * 
+     * 
+    */
+    private function _registerWPDB(){ 
+        global $wpdb;
+        $this->wpdb = $wpdb;
     }
     
    /**
@@ -390,13 +411,13 @@ class EuroFIFALeagueLoader {
       * 
     */
     function get_player($arg = false){ 
-        global $wpdb;
+        //global $wpdb;
 
         if($arg){ 
-            $result = $wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$wpdb->ef_users} WHERE ID = $arg",ARRAY_A); 
+            $result = $this->wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$this->wpdb->ef_users} WHERE ID = $arg",ARRAY_A); 
             return $result[0];
         }else{ 
-           return $wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$wpdb->ef_users}", ARRAY_A);
+           return $this->wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$this->wpdb->ef_users}", ARRAY_A);
         }
    
     }
