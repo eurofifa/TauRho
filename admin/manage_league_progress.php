@@ -3,7 +3,7 @@
 <p>
     This screen allows you to manage the progress of your league. You might add or kick players to the league.
 </p>
-
+<?php var_dump($data); ?>
 <form action="" method="post" class="stuffbox" style="padding: 25px">
     <table class="form-table">    
         <tr valign="top">

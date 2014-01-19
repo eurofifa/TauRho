@@ -361,10 +361,10 @@ class EuroFIFALeagueLoader {
         global $wpdb;
 
         if($arg){ 
-            $result = $wpdb->get_results("SELECT ID, usernicename, display_name FROM {$wpdb->ef_users} WHERE ID = $arg",ARRAY_A); 
+            $result = $wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$wpdb->ef_users} WHERE ID = $arg",ARRAY_A); 
             return $result[0];
         }else{ 
-           return $wpdb->get_results("SELECT ID, usernicename, display_name FROM {$wpdb->ef_users}");
+           return $wpdb->get_results("SELECT ID, user_nicename, display_name FROM {$wpdb->ef_users}");
         }
    
     }
