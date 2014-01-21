@@ -336,22 +336,18 @@ class EuroFIFALeagueLoader {
      * @note shows editable array
      * 
      * @todo optional comparism with another array
+     * @todo further simplifaction and far more options for wider range of implementation
      * 
      * @state COMPLETE/OPEN
      * 
     */
-    private function _arrayIzer($arg, $link = false, $button = false){ 
-        
+    private function _arrayIzer($arg, $link = false, $button = false, $signup = false){ 
         if(!$button){ $button = 'Save'; }
-        
         $result .= '<table width="200"><tbody>';
-        
-        foreach ($arg as $key => $value){          
-                    $result .= '<tr><td><form action="" method="post"><input type="hidden" name="ID" value="'.$value['ID'].'"/>'.$value['user_nicename'].'</td><td><input type="submit" name="submit" class="button button-primary" value="'.$button.'"></form></td></tr>';
-        }
-        
+        if(!$signup){ 
+             foreach ($arg as $key => $value) { $result .= '<tr><td><form action="" method="post"><input type="hidden" name="ID" value="' . $value['ID'] . '"/>' . $value['user_nicename'] . '</td><td><input type="submit" name="submit" class="button button-primary" value="' . $button . '"></form></td></tr>';}
+        }else{ foreach ($arg as $key => $value) { $result .= '<tr><td><form action="" method="post"><input type="hidden" name="ID" value="' . $value['id'] . '"/>' . $value['player_name'] . '</td><td><input type="submit" name="submit" class="button button-primary" value="' . $button . '"></form></td></tr>'; }}
         $result .= '</tbody></table>';
-        
         return $result;
     }
     
@@ -488,6 +484,38 @@ class EuroFIFALeagueLoader {
         }
    
     }
+    
+    /**
+      * Query All or One Signed Up player for the current or selected league
+      * 
+      * @author MagoR
+      * 
+      * @param $id league id
+      * @param $pid player id
+      * @return array assoc
+      * 
+      * @note return all or one signe up player for the current or selected league
+      * @note or returns all leagues where the player signed up (further enhancement needed)
+      * 
+      * @todo finalization and further enhancement
+      * @todo simplification of queries
+      * @state COMPLETE/CLOSED
+      * 
+    */
+    function get_signups($id = false, $pid = false){ 
+        if($id && $pid){ 
+            $result = $this->wpdb->get_results("SELECT * FROM {$this->wpdb->ef_signups} WHERE league_id = $id AND player_id = $pid",ARRAY_A); 
+            return $result[0];
+        }elseif($id && !$pid){
+            $result = $this->wpdb->get_results("SELECT * FROM {$this->wpdb->ef_signups} WHERE league_id = $id",ARRAY_A); 
+            return $result;
+        }elseif(!$id && $pid){ 
+            $result = $this->wpdb->get_results("SELECT * FROM {$this->wpdb->ef_signups} WHERE player_id = $pid",ARRAY_A); 
+            return $result;
+        }else{ 
+            return $this->wpdb->get_results("SELECT * FROM {$this->wpdb->ef_signups}", ARRAY_A);
+        }
+    }
  
      /**
       * Query Match or Matches
@@ -618,21 +646,37 @@ class EuroFIFALeagueLoader {
       *
       * @author MagoR
       * 
-      * @param $arg array
+      * @param $arg array posted by form
+      * @param $query array  
       * @return bool on error
       * 
       * @note updates league record in appropriate table and creates sign_up record
+      * @note queries signed up users using get_signups method
       * 
-      * @todo $wpdb queries, analysis
+      * @todo further enhancements if needed
+      * @todo TEST SIGNUP functionality
       * 
-      * @state INPROGRESS/INOP
+      * @state COMPLETE/OPEN
       * 
       * 
     */
-    function sign_up($arg = false){ 
-        $arg = $this->_arrayInput($arg);
-    
-        
+    function sign_up($arg = false, $query = false){ 
+        global $wpdb;
+        if($arg){ 
+            $wpdb->insert($wpdb->ef_signups, array(
+                'player_name' => $arg['name'],
+                'player_id' => $arg['id'],
+                'league_id' => $arg['lid'],
+                'league_name' => $arg['lname'],
+                'date' => date('Y-m-d H:i:s'),
+                'status' => 'joined',
+                ));
+            $wpdb->query("UPDATE {$wpdb->ef_leagues} SET signups = signups + 1 WHERE `ID` = '{$arg['lid']}'");  
+        }
+        if($query){
+            if(!isset($query[1])){ $query[1] = false; }
+            return $this->get_signups($query[0], $query[1]);
+        }  
     }
        
     /**
@@ -812,8 +856,10 @@ class EuroFIFALeagueLoader {
     */
     function load_manage_league_progress($arg = false){ 
         $this->data['users'] = $this->_arrayIzer($this->get_player(),false,'Add');
+        $this->data['signups'] = $this->_arrayIzer($this->sign_up(false, array($arg)),false,'Kick',true);
         $this->view = $this->get_league($arg);
         $this->modules = $this->show_module('add_players',array('search' => 'OPEN', 'ID' => $arg));
+        $this->modules .= $this->show_module('manage_sign_ups');
         $this->_loadTemplate('manage_league_progress', true); 
     }
     
