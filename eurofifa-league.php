@@ -366,20 +366,20 @@ class EuroFIFALeagueLoader {
      * @note returns true if requested status found
      * @note by default checks requested state in among the leagues
      * @note if no search parameter provided or no item ID assigned returns FALSE
-     * @note fully customizable state check  
+     * @note fully customizable state check
+     * @example  input array('search' => 'registered', 'ID' => 1);
      * 
      * @state COMPLETE/CLOSED
      * 
     */
-    private function _check_state($arg = array('return' => 'status','table' => false,'column' => 'status','search' => false, 'C_ID' => 'ID', 'ID' => false)){ 
-        global $wpdb;
-        //$arg['table'] = (isset($arg['table'])) ? $arg['table'] : $wpdb->ef_leagues;
-        if(!$arg['table']){ $arg['table'] = $wpdb->ef_leagues; }
-        if(!$arg['search'] || !$arg['ID']){ return false; }
+    private function _check_state(array $arg){ 
+        if(!$arg['search'] || !$arg['ID']){ return false; }else{ $arg['ID'] = intval($arg['ID']); }
+        $arg_default = array('return' => 'status','table' => $this->wpdb->ef_leagues ,'column' => 'status','search' => false, 'C_ID' => 'ID', 'ID' => false);
+        $arg = array_merge($arg_default,$arg);
+        $return = $arg['return'];
+        $result = $this->wpdb->get_results("SELECT * FROM {$arg['table']} WHERE `{$arg['C_ID']}` = '{$arg['ID']}' AND `{$arg['return']}` = '{$arg['search']}'", ARRAY_A);
         
-        $result = $this->wpdb->get_results("SELECT {$arg['return']} FROM {$arg['table']} WHERE {$arg['column']} = {$arg['search']} AND {$arg['C_ID']} = {$arg['ID']}", ARRAY_A);
-        
-        if($result[$arg['return']]){ 
+        if(isset($result[0][$arg['return']])){ 
             return true;
         }else{ 
             return false;
@@ -423,6 +423,7 @@ class EuroFIFALeagueLoader {
      * 
      * @note for more options check out _check_state method documentation
      * @note to unconditionally include a module just omit providing $arg parameter
+     * @note input array('search' => 'open', 'ID' => 1 );
      * 
      * @state COMPLETE/CLOSED
      * 
@@ -812,7 +813,7 @@ class EuroFIFALeagueLoader {
     function load_manage_league_progress($arg = false){ 
         $this->data['users'] = $this->_arrayIzer($this->get_player(),false,'Add');
         $this->view = $this->get_league($arg);
-        $this->modules = $this->show_module('add_players');
+        $this->modules = $this->show_module('add_players',array('search' => 'OPEN', 'ID' => $arg));
         $this->_loadTemplate('manage_league_progress', true); 
     }
     
